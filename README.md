@@ -3,11 +3,12 @@
 A command-line Python application that connects to a PostgreSQL database and performs
 **CRUD** (Create, Read, Update, Delete) operations on a `students` table.
 
-**Author:** Yaso — Carleton University, COMP 3005 Database Systems
+**Author:** Yassein Kndeel — Carleton University, COMP 3005 Database Systems
 
-## 🎥 Demonstration Video
+**Repository:** https://github.com/Yasseincarleton/comp3005-students-crud
 
-**Video link:** <PASTE YOUR YOUTUBE / ONEDRIVE LINK HERE>
+> A sample run of every function, with the resulting database state, is included in the
+> [Demonstration](#demonstration-sample-run) section below.
 
 ---
 
@@ -43,7 +44,7 @@ comp3005-students-crud/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/comp3005-students-crud.git
+git clone https://github.com/Yasseincarleton/comp3005-students-crud.git
 cd comp3005-students-crud
 ```
 
@@ -160,8 +161,23 @@ Initial data: John Doe, Jane Smith and Jim Beam (IDs 1–3).
 
 ---
 
-## Example Session
+## Demonstration (Sample Run)
 
+A full run that calls every function, starting from the initial data (menu output trimmed).
+
+**1. `getAllStudents()`: initial data**
+```
+Choose an option: 1
+ID   First Name   Last Name    Email                          Enrolled
+------------------------------------------------------------------------
+1    John         Doe          john.doe@example.com           2023-09-01
+2    Jane         Smith        jane.smith@example.com         2023-09-01
+3    Jim          Beam         jim.beam@example.com           2023-09-02
+
+3 record(s) found.
+```
+
+**2. `addStudent()`**
 ```
 Choose an option: 2
 First name: Alice
@@ -169,16 +185,59 @@ Last name: Nguyen
 Email: alice.nguyen@example.com
 Enrollment date (YYYY-MM-DD, blank for none): 2024-01-15
 [OK] Added Alice Nguyen with student_id = 4.
+```
 
+**3. `updateStudentEmail()`**
+```
 Choose an option: 3
 Student ID: 4
 New email: alice.n@example.com
 [OK] Email for student_id 4 updated to 'alice.n@example.com'.
+```
 
+**4. `deleteStudent()`**
+```
 Choose an option: 4
 Student ID: 2
 [OK] Student with student_id 2 deleted.
 ```
 
-Check each change in pgAdmin by running `SELECT * FROM students ORDER BY student_id;`
-in the Query Tool, or by right-clicking the table and choosing **View/Edit Data → All Rows**.
+**5. `getAllStudents()`: final state**
+```
+Choose an option: 1
+ID   First Name   Last Name    Email                          Enrolled
+------------------------------------------------------------------------
+1    John         Doe          john.doe@example.com           2023-09-01
+3    Jim          Beam         jim.beam@example.com           2023-09-02
+4    Alice        Nguyen       alice.n@example.com            2024-01-15
+
+3 record(s) found.
+```
+
+**Database state checked directly in PostgreSQL** (same query in the pgAdmin Query Tool):
+```
+students_db=# SELECT * FROM students ORDER BY student_id;
+ student_id | first_name | last_name |        email         | enrollment_date
+------------+------------+-----------+----------------------+-----------------
+          1 | John       | Doe       | john.doe@example.com | 2023-09-01
+          3 | Jim        | Beam      | jim.beam@example.com | 2023-09-02
+          4 | Alice      | Nguyen    | alice.n@example.com  | 2024-01-15
+(3 rows)
+```
+This shows the INSERT (Alice, ID 4, auto-generated), the UPDATE (Alice's new email) and the DELETE (Jane, ID 2)
+were all committed to the database.
+
+**Error handling examples**
+```
+Email: john.doe@example.com
+[ERROR] A student with email 'john.doe@example.com' already exists.     # UNIQUE constraint
+
+Student ID: 99
+[WARN] No student found with student_id = 99.                         # non-existent ID
+
+Enrollment date (YYYY-MM-DD, blank for none): baddate
+  Invalid date. Use the format YYYY-MM-DD, e.g. 2023-09-01.           # input validation
+```
+
+To check the changes yourself, run `SELECT * FROM students ORDER BY student_id;` in the pgAdmin
+Query Tool, or right-click the table and choose **View/Edit Data → All Rows**.

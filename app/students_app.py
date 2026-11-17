@@ -29,6 +29,10 @@ import psycopg2
 from psycopg2 import errors
 
 
+# -----------------------------------------------------------------------------
+# Database connection
+# -----------------------------------------------------------------------------
+
 # Connection parameters, overridable through environment variables.
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "localhost"),
@@ -53,7 +57,9 @@ def get_connection():
         sys.exit(1)
 
 
-
+# -----------------------------------------------------------------------------
+# CRUD functions (the four functions required by the assignment)
+# -----------------------------------------------------------------------------
 
 def getAllStudents():
     """READ: Retrieve and display every record in the students table.
@@ -167,9 +173,9 @@ def deleteStudent(student_id):
     return False
 
 
-
-# Input helpers: validate user input before it reaches the database
-
+# -----------------------------------------------------------------------------
+# Input helpers (validate user input before it reaches the database)
+# -----------------------------------------------------------------------------
 
 def prompt_non_empty(label):
     """Keep asking until the user enters a non-blank value."""
@@ -201,9 +207,9 @@ def prompt_date(label):
             print("  Invalid date. Use the format YYYY-MM-DD, e.g. 2023-09-01.")
 
 
-
-# Interactive menu: lets each function be called and demonstrated
-
+# -----------------------------------------------------------------------------
+# Interactive menu (lets each function be called and demonstrated)
+# -----------------------------------------------------------------------------
 
 MENU = """
 ========== Students Database ==========
@@ -217,9 +223,9 @@ MENU = """
 
 def main():
     """Show the menu in a loop and dispatch to the matching CRUD function."""
+    get_connection().close()  # fail fast if the database is unreachable
     print(f"Connected to database '{DB_CONFIG['dbname']}' on "
           f"{DB_CONFIG['host']}:{DB_CONFIG['port']} as '{DB_CONFIG['user']}'.")
-    get_connection().close()  # fail fast if the database is unreachable
 
     while True:
         print(MENU)
@@ -245,6 +251,6 @@ def main():
             print("Invalid option, please choose 0-4.")
 
 
-
+# Only start the menu when this file is run directly (not when imported).
 if __name__ == "__main__":
     main()
